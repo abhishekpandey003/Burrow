@@ -44,6 +44,11 @@ func (emailer *EmailNotifier) Notify(msg Message) error {
 		return nil
 	}
 
+	if emailer.IgnoreZeroLag(msg) {
+		log.Debug("Ignoring empty mail")
+		return nil
+	}
+
 	if emailer.auth == nil {
 		switch emailer.AuthType {
 		case "plain":
@@ -80,6 +85,22 @@ func (emailer *EmailNotifier) Notify(msg Message) error {
 
 func (emailer *EmailNotifier) Ignore(msg Message) bool {
 	return int(msg.Status) < emailer.Threshold
+}
+
+func (emailer *EmailNotifier) IgnoreZeroLag(msg Message) bool {
+
+	isIgnore := true
+	if(len(msg.Partitions) > 0) {
+
+		for _, partition := range msg.Partitions {
+			if(partition.End.Lag > 0) {
+				isIgnore = false
+				break
+			}
+		}
+	}
+
+	return isIgnore
 }
 
 func (emailer *EmailNotifier) sendConsumerGroupStatusNotify() error {
