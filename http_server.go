@@ -12,7 +12,7 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/linkedin/Burrow/protocol"
+	"github.com/abhishekpandey003/Burrow/protocol"
 	"io"
 	"net/http"
 	"os"
